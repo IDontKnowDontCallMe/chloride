@@ -1,7 +1,7 @@
 module.exports = function(sequelize, DataTypes) {
 
 
-    var AlbumComment = sequelize.define("albumComment", {
+    var AlbumComment = sequelize.define("AlbumComment", {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,

@@ -1,7 +1,7 @@
 module.exports = function(sequelize, DataTypes) {
 
 
-    var Notification = sequelize.define("notification", {
+    var Notification = sequelize.define("Notification", {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,

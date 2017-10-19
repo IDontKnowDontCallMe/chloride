@@ -1,7 +1,7 @@
 module.exports = function(sequelize, DataTypes) {
 
 
-    var PostComment = sequelize.define("postComment", {
+    var PostComment = sequelize.define("PostComment", {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -26,7 +26,7 @@ module.exports = function(sequelize, DataTypes) {
     PostComment.associate = function(models) {
 
         PostComment.belongsTo(models.User, {as:'author'});
-        PostComment.belongsTo(models.Post, {as:'post'})
+        PostComment.belongsTo(models.Post, {as:'post', foreignKey:'postId'})
 
     }
 

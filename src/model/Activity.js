@@ -1,7 +1,7 @@
 module.exports = function(sequelize, DataTypes) {
 
 
-    var Activity = sequelize.define("activity", {
+    var Activity = sequelize.define("Activity", {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,

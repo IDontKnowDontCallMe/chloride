@@ -1,7 +1,7 @@
 module.exports = function(sequelize, DataTypes) {
 
 
-    var Photo = sequelize.define("photo", {
+    var Photo = sequelize.define("Photo", {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
