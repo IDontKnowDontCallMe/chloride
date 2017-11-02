@@ -10,6 +10,7 @@
   "author": "sjl",
   "license": "ISC",
   "dependencies": {
+    "gm": "^1.23.0",
     "koa": "^2.3.0",
     "koa-body": "^2.5.0",
     "koa-passport": "^4.0.1",

@@ -5,7 +5,7 @@ const session = require('koa-session');
 
 //init the database config, run the code only
 var db = require('./model/index');
-db.sequelize.sync({force: true}).then(function() {
+db.sequelize.sync({force: false}).then(function() {
     console.log("Database successed to init");
 }).catch(function(err){
     console.log("Database failed to start due to error: %s", err);
@@ -46,6 +46,7 @@ const bodyParserConfig = {
 }
 
 app.use(bodyParser(bodyParserConfig));
+
 // authentication,加载passport设置
 require('./auth')
 const passport = require('koa-passport')

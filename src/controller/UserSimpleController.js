@@ -6,14 +6,10 @@ function getUser(userId) {
     }
 }
 
-function addUser(userId) {
-    return  {
-        userName: 'testAddUser',
-        userId: userId,
-    }
+async function addUser() {
+
 }
 
 
-module.exports = {
-    getUser, addUser
-}
+module.exports = this;
+
