@@ -2,6 +2,8 @@ const Koa = require('koa');
 const path = require('path');
 const bodyParser = require('koa-body');
 const session = require('koa-session');
+const cors = require('koa2-cors');
+const serve = require('koa-static');
 
 //init the database config, run the code only
 var db = require('./model/index');
@@ -16,6 +18,12 @@ db.sequelize.sync({force: false}).then(function() {
 
 
 const app = new Koa();
+
+//静态资源映射(先这样应付着吧)
+let imagesPath = path.resolve(__dirname, '../statics');
+app.use(serve(imagesPath));
+
+
 
 //cookie 加密(签名)秘钥, 启用session
 //session config
@@ -46,6 +54,22 @@ const bodyParserConfig = {
 }
 
 app.use(bodyParser(bodyParserConfig));
+
+//允许跨域
+app.use(cors({
+    origin: function(ctx) {
+        // if (ctx.url === '/test') {
+        //     return false;
+        // }
+        //console.log(ctx.url)
+        return 'http://localhost:8080';
+    },
+    exposeHeaders: ['WWW-Authenticate', 'Server-Authorization'],
+    maxAge: 5,
+    credentials: true,
+    allowMethods: ['GET', 'POST', 'DELETE'],
+    allowHeaders: ['Content-Type', 'Authorization', 'Accept', 'Cache-Control', 'X-Requested-With'],
+}))
 
 // authentication,加载passport设置
 require('./auth')

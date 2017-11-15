@@ -1,4 +1,5 @@
 const UserModel = require('../model').User;
+const IPAddress = require('../util/hostName').ip;
 
 /*
 * user:{
@@ -14,8 +15,15 @@ async function addUser(user) {
 
     let u1 = await UserModel.findOne({ where: { username: user.username }, raw: true });
 
+
+
     if(u1===null){
-        await UserModel.create({ username: user.username, password: user.password, popularity:0, activityValue:100 });
+
+        let userNum = await UserModel.count();
+
+        userNum = String(userNum%10);
+
+        await UserModel.create({ username: user.username, password: user.password, popularity:0, activityValue:100, avatar:`/${userNum}.jpg` });
 
         return true;
     }
@@ -48,15 +56,23 @@ async function verifyPassword(param) {
 
     if(u1===null){
 
-        return {message: 'noUser', user:null};
+        return {message: '没有这个用户名!', success: false};
     }
     else {
 
         if(param.password === u1.password){
-            return {message: 'success', user:u1};
+
+
+
+            return {
+
+                success:true,
+                message: 'success',
+                user:u1
+            };
         }
         else {
-            return {message: 'passwordErr', user: null};
+            return {message: '密码错误!', success: false};
         }
 
     }

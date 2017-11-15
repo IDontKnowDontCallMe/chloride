@@ -16,6 +16,11 @@ module.exports = function(sequelize, DataTypes) {
             type: DataTypes.STRING,
             allowNull: false,
         },
+        avatar: {
+            type: DataTypes.STRING,
+            unique: false,
+            allowNull: true,
+        },
         popularity:{
             type: DataTypes.INTEGER,
             allowNull: false,

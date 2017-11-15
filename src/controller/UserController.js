@@ -29,10 +29,10 @@ async function register(param) {
     let result = await UserServicce.addUser({username: param.username, password: param.password})
 
     if(result){
-        return {message:'success register'}
+        return {message:'success register', success:true}
     }
     else {
-        return {message:'error register'}
+        return {message:'error register', success:false}
     }
 
 }

@@ -29,7 +29,7 @@ passport.use(new LocalStrategy(
 
         UserService.verifyPassword({username:username, password:password})
             .then(result => {
-                if (result.message==='success') {
+                if (result.success===true) {
                     done(null, result.user, result)
                 } else {
                     done(null, false, result)

@@ -1,12 +1,15 @@
 const Router = require('koa-router');
 const passport = require('koa-passport')
 const UserController = require('./controller/UserController');
+const PhotoController = require('./controller/PhotoController');
+const AvatarDir = require('./util/hostName').avtarDir;
 
 var router = new Router();
 
 router.post('/login',
     function(ctx) {
         //console.log(ctx.request.body)
+        //console.log(ctx.request)
         ctx.request.body.username = ctx.request.body.fields.username;
         ctx.request.body.password = ctx.request.body.fields.password;
 
@@ -18,12 +21,41 @@ router.post('/login',
                 ctx.body = info;
                 //ctx.throw(401)
             } else {
-                ctx.body = info;
+                const {} = info;
+                ctx.body = {
+
+                    success: true,
+                    message: 'success',
+                    userId: user.id,
+                    userName: user.username,
+                    userAvatar: AvatarDir+user.avatar,
+                };
                 return ctx.login(user)
             }
         })(ctx)
     }
 );
+
+router.get('/tryLogin',
+    function (ctx) {
+        if(ctx.isAuthenticated()){
+            ctx.body = {
+
+                success: true,
+                message: 'success',
+                userId: ctx.state.user.id,
+                userName: ctx.state.user.username,
+                userAvatar: AvatarDir+ctx.state.user.avatar,
+            };
+        }
+        else {
+            ctx.body = {
+
+                success: false,
+            };
+        }
+    }
+)
 
 router.post('/register',
     async function (ctx) {
@@ -41,12 +73,52 @@ router.post('/register',
     }
 );
 
+router.post('/logout',
+    async function (ctx) {
+        ctx.logout();
+        ctx.body = {
+            success: true,
+        }
+    }
+)
+
 router.get('/userInfo/:userId',
     async function (ctx){
 
         let result = await UserController.getUserById(ctx.params.userId);
 
         ctx.body = result;
+
+    }
+);
+
+router.post('/uploadTempFile',
+    async function (ctx) {
+
+        let param = {
+            qquuid: ctx.request.body.fields.qquuid,
+            tempFilePath: ctx.request.body.files.qqfile.path
+        }
+
+        let result = await PhotoController.uploadTempfile(param);
+
+
+        ctx.body = result;
+
+    }
+);
+
+router.delete('/deleteTempFile/:qquuid',
+    async function (ctx) {
+
+        ctx.status = 200;
+        ctx.body = {
+            success: true,
+            qquuid: ctx.params.qquuid,
+        };
+
+        console.log('delete')
+        console.log(ctx.params.qquuid)
 
     }
 );
