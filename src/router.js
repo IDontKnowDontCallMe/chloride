@@ -2,7 +2,7 @@ const Router = require('koa-router');
 const passport = require('koa-passport')
 const UserController = require('./controller/UserController');
 const PhotoController = require('./controller/PhotoController');
-const AvatarDir = require('./util/hostName').avtarDir;
+const AvatarDir = require('./util/hostName').avatarDir;
 
 var router = new Router();
 
@@ -85,7 +85,15 @@ router.post('/logout',
 router.get('/userInfo/:userId',
     async function (ctx){
 
-        let result = await UserController.getUserById(ctx.params.userId);
+        let requestUserId = null;
+        if(ctx.isAuthenticated()){
+            requestUserId = ctx.state.user.id;
+            if(requestUserId===Number(ctx.params.userId)){
+                requestUserId = null;
+            }
+        }
+
+        let result = await UserController.getUserInfo(Number(ctx.params.userId), requestUserId);
 
         ctx.body = result;
 
@@ -139,6 +147,43 @@ router.use('/private',function(ctx, next) {
         ctx.throw(401);
     }
 })
+
+router.get('/private/addFollowing/:followingId',
+    async function (ctx) {
+
+        let followerId = ctx.state.user.id;
+
+        let result = await UserController.addFollowing(followerId, Number(ctx.params.followingId));
+
+        ctx.body = result;
+
+    }
+)
+
+router.get('/private/cancelFollowing/:followingId',
+    async function (ctx) {
+
+        let followerId = ctx.state.user.id;
+
+        let result = await UserController.cancelFollowing(followerId, Number(ctx.params.followingId));
+
+        ctx.body = result;
+
+    }
+)
+
+router.get('/private/peopleInfo',
+    async function (ctx) {
+
+        let userId = ctx.state.user.id;
+
+        let result = await UserController.getPeopleInfo(userId);
+
+        ctx.body = result;
+
+
+    }
+)
 
 router.post('/private/album',
     async function (ctx) {

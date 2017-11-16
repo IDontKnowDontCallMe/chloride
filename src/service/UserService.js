@@ -50,7 +50,7 @@ async function addUser(user) {
 * */
 async function verifyPassword(param) {
 
-    console.log('verrify password')
+    //console.log('verrify password')
 
     let u1 = await UserModel.findOne({ where: { username: param.username }, raw: true });
 
@@ -92,9 +92,35 @@ async function verifyPassword(param) {
 *
 *
 * */
-async function getUserById(id) {
+async function getUserById(userId) {
 
-    return await UserModel.findById(id);
+    return await UserModel.findById(userId);
+
+
+
+}
+
+async function getFollowingsOf(userId) {
+
+    return await UserModel.findById(userId)
+        .then((user)=>{
+        if(user===null){
+            return [];
+        }
+        return user.getFollowings()
+    });
+
+}
+
+async function getFollowersOf(userId) {
+
+    return await UserModel.findById(userId)
+        .then((user)=>{
+            if(user===null){
+                return [];
+            }
+            return user.getFollowers()
+        });
 
 }
 
@@ -117,11 +143,49 @@ async function getUserByUsername(username) {
 
 }
 
+
+async function addFollowing(followerId, followingId){
+
+    let followerUser = await UserModel.findById(followerId);
+    let followingUser = await UserModel.findById(followingId);
+
+    if(followerUser===null || followingUser===null){
+        return false;
+    }
+    else {
+        await followerUser.addFollowing(followingUser);
+        return true;
+    }
+
+
+}
+
+async function cancelFollowing(followerId, followingId){
+
+    let followerUser = await UserModel.findById(followerId);
+    let followingUser = await UserModel.findById(followingId);
+
+    if(followerUser===null || followingUser===null){
+        return false;
+    }
+    else {
+        await followerUser.removeFollowing(followingUser);
+        return true;
+    }
+
+
+}
+
 module.exports = {
 
     addUser,
     verifyPassword,
     getUserById,
     getUserByUsername,
+    getFollowingsOf,
+    getFollowersOf,
+    addFollowing,
+    cancelFollowing,
+
 
 }
