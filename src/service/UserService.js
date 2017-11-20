@@ -1,5 +1,5 @@
 const UserModel = require('../model').User;
-const IPAddress = require('../util/hostName').ip;
+const IPAddress = require('../util/StaticPath').ip;
 
 /*
 * user:{

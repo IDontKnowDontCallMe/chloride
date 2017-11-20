@@ -9,23 +9,34 @@ module.exports = function(sequelize, DataTypes) {
         },
         origin: {
             type: DataTypes.STRING,
+            allowNull: false,
             unique: true,
+
+        },
+        width: {
+            type: DataTypes.INTEGER,
             allowNull: false,
         },
+
+        height: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+
         simg: {
             type: DataTypes.STRING,
             unique: true,
-            allowNull: false,
+            allowNull: true,
         },
         mimg: {
             type: DataTypes.STRING,
             unique: true,
-            allowNull: false,
+            allowNull: true,
         },
         bimg: {
             type: DataTypes.STRING,
             unique: true,
-            allowNull: false,
+            allowNull: true,
         },
 
 

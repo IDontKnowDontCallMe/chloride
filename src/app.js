@@ -42,18 +42,18 @@ app.keys = ['some secret hurr 2333 333 3 33 ahah'];
 app.use(session(sessionConfig, app));
 
 //启用koa-body
-const uploadDirPath = path.resolve(__dirname, '../uploads');
-const bodyParserConfig = {
+// const uploadDirPath = path.resolve(__dirname, '../uploads');
+// const bodyParserConfig = {
+//
+//     multipart: true,
+//     formidable: {
+//         uploadDir: uploadDirPath,
+//         keepExtensions: true
+//     }
+//
+// }
 
-    multipart: true,
-    formidable: {
-        uploadDir: uploadDirPath,
-        keepExtensions: true
-    }
-
-}
-
-app.use(bodyParser(bodyParserConfig));
+// app.use(bodyParser(bodyParserConfig));
 
 //允许跨域
 app.use(cors({

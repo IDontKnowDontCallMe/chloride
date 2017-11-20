@@ -1,12 +1,27 @@
 const Router = require('koa-router');
+const path = require('path')
 const passport = require('koa-passport')
 const UserController = require('./controller/UserController');
 const PhotoController = require('./controller/PhotoController');
-const AvatarDir = require('./util/hostName').avatarDir;
+const AlbumController = require('./controller/AlbumController')
+const AvatarDir = require('./util/StaticPath').avatarDir;
+
+const koaBody   = require('koa-body');
+const uploadDirPath = path.resolve(__dirname, '../uploads');
+const bodyParserConfig = {
+
+    multipart: true,
+    formidable: {
+        uploadDir: uploadDirPath,
+        keepExtensions: true
+    }
+
+}
 
 var router = new Router();
 
 router.post('/login',
+    koaBody(bodyParserConfig),
     function(ctx) {
         //console.log(ctx.request.body)
         //console.log(ctx.request)
@@ -58,6 +73,7 @@ router.get('/tryLogin',
 )
 
 router.post('/register',
+    koaBody(bodyParserConfig),
     async function (ctx) {
 
         let fields = ctx.request.body.fields;
@@ -101,6 +117,7 @@ router.get('/userInfo/:userId',
 );
 
 router.post('/uploadTempFile',
+    koaBody(bodyParserConfig),
     async function (ctx) {
 
         let param = {
@@ -131,6 +148,31 @@ router.delete('/deleteTempFile/:qquuid',
     }
 );
 
+router.get('/albumDetail/:albumId',
+    async function (ctx) {
+
+        let userId = ctx.isAuthenticated()? ctx.state.user.id: null;
+
+        let result = await AlbumController.getAlbumDitali(Number(ctx.params.albumId), userId)
+
+        ctx.body = result;
+
+    }
+)
+
+router.post('/getPhotosOfTheme',
+    koaBody(),
+    async function (ctx) {
+        console.log(ctx.request.body)
+        console.log(ctx.request.body.theme)
+        let result = await AlbumController.getAlbumListOfTheme(ctx.request.body.theme);
+
+
+        ctx.body = result;
+
+    }
+)
+
 
 router.get('/',
     ctx =>{
@@ -147,6 +189,30 @@ router.use('/private',function(ctx, next) {
         ctx.throw(401);
     }
 })
+
+router.post('/private/createAlbum',
+    koaBody(),
+    async function (ctx){
+
+        // const param = {
+        //     head : this.state.head,
+        //     description: this.state.description,
+        //     theme: this.state.theme,
+        //
+        //     tags: this.state.tags,
+        //     imageFiles: this.uploadedImage,
+        // }
+
+        let result =  await AlbumController.createAlbum(ctx.request.body, ctx.state.user.id)
+
+        console.log(result)
+
+        ctx.body = {
+            success: false,
+        };
+
+    }
+)
 
 router.get('/private/addFollowing/:followingId',
     async function (ctx) {

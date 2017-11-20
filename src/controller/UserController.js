@@ -1,5 +1,5 @@
 const UserServicce = require('../service/UserService');
-const AvatarDir = require('../util/hostName').avatarDir
+const AvatarDir = require('../util/StaticPath').avatarDir
 
 /*
 *
