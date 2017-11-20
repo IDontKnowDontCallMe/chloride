@@ -1,5 +1,8 @@
 const AlbumModel = require('../model').Album;
 const TagModel = require('../model').Tag;
+const PhotoModel = require('../model').Photo;
+const UserModel = require('../model').User;
+const originPath = require('../util/StaticPath').originPath;
 
 
 let recentCreatedAlbums = [];
@@ -72,7 +75,6 @@ initAlbumService();
 *      description: string
 *      theme: string
 *      authorId: int
-*      tags: [string]
 *
 * }
 *
@@ -86,15 +88,80 @@ async function addAlbum(album){
                             description: album.description,
                             theme: album.theme,
                             authorId: album.authorId,
+                            coverImg: ''
                         });
 
-    return result.id;
+    return result;
+
+}
+
+async function getAlbumDetail(albumId, requestUserId){
+
+
+    let album = await AlbumModel.findById(albumId);
+
+    if(album===null){
+        return null;
+    }
+
+    let photoList = [];
+    let photos = await album.getPhotos();
+    for(photo of photos){
+
+        photoList.push({
+            photoId: photo.id,
+            url: originPath+photo.origin,
+            height: photo.height,
+            width: photo.width,
+        })
+
+    }
+
+    let author = await album.getAuthor();
+
+    let hasStaredIt = false;
+    if(requestUserId){
+        let starUser = await album.getStarUsers({where:{id: requestUserId}});
+        hasStaredIt = starUser.length===0? false: true;
+    }
+
+
+
+    return {
+        albumId: album.id,
+        albumName: album.name,
+        theme: album.theme,
+        albumDescription: album.description,
+        authorId: album.authorId,
+        authorName: author.username,
+
+        starNum: album.star,
+        hasStaredIt: hasStaredIt,
+
+        photoList: photoList,
+        commentList: [],
+    }
+
+}
+
+async function getAlbumListOfTheme(theme){
+
+
+    if(theme==='全部'){
+        return await AlbumModel.findAll();
+    }
+    else {
+        return await AlbumModel.findAll({where:{theme:theme}})
+    }
+
 
 }
 
 
 module.exports = {
 
-
+    addAlbum,
+    getAlbumDetail,
+    getAlbumListOfTheme
 
 }
