@@ -1,5 +1,6 @@
 const UserServicce = require('../service/UserService');
-const AvatarDir = require('../util/StaticPath').avatarDir
+const AvatarDir = require('../util/StaticPath').avatarDir;
+const thumbnailPath = require('../util/StaticPath').thumbnailPath;
 
 /*
 *
@@ -60,6 +61,31 @@ async function getUserInfo(userId, requestId) {
         }
     }
 
+    let albumList = [];
+    let albums = await userInfo.getAlbums();
+    for(album of albums){
+        albumList.push({
+            url: '',
+            coverUrl: thumbnailPath+album.coverImg,
+            name: album.name,
+            starNum: album.star,
+            albumId: album.id,
+        },)
+    }
+
+    let postList = [];
+    let posts = await userInfo.getPosts();
+    for(post of posts){
+        postList.push({
+            url: '',
+            postId: post.id,
+            postName: post.title,
+            createdAt: post.createdAt,
+            updatedAt: post.updatedAt,
+            answerNum: 0,
+        })
+    }
+
     return {
         success: true,
         userId: userInfo.id,
@@ -67,8 +93,8 @@ async function getUserInfo(userId, requestId) {
         userAvatar: AvatarDir+userInfo.avatar,
         hasFollowed: hasFollowed,
 
-        albumList: [],
-        postList: [],
+        albumList: albumList,
+        postList: postList,
     }
 
 }

@@ -9,11 +9,40 @@ async function addNotification(type, makerId, itemId) {
         case 1:
             await __addCreatingAlbumNotification(makerId, itemId)
             break;
+        case 2:
+            await __addCreatingPostNotification(makerId, itemId)
+            break;
         default:
             break;
 
     }
 
+
+}
+
+async function __addCreatingPostNotification(authorId,　postId){
+
+    let author = await UserModel.findById(authorId);
+    let followersList = await author.getFollowers();
+
+    if(followersList.length===0){
+        return;
+    }
+    else {
+
+        let promiseList = [];
+        for(follower of followersList){
+            promiseList.push(NotificationModel.create({
+                type: 2,
+                makerId: authorId,
+                receiverId: follower.id,
+                itemId: postId,
+            }))
+        }
+
+        await Promise.all(promiseList)
+
+    }
 
 }
 

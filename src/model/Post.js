@@ -12,7 +12,7 @@ module.exports = function(sequelize, DataTypes) {
             allowNull: false,
             defaultValue: '无标题',
         },
-        conntent: {
+        content: {
             type: DataTypes.TEXT,
             allowNull: false,
             defaultValue: '<p> </p>'

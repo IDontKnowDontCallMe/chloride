@@ -3,7 +3,8 @@ const path = require('path')
 const passport = require('koa-passport')
 const UserController = require('./controller/UserController');
 const PhotoController = require('./controller/PhotoController');
-const AlbumController = require('./controller/AlbumController')
+const AlbumController = require('./controller/AlbumController');
+const PostController = require('./controller/PostController');
 const AvatarDir = require('./util/StaticPath').avatarDir;
 
 const koaBody   = require('koa-body');
@@ -158,6 +159,31 @@ router.get('/albumDetail/:albumId',
         ctx.body = result;
 
     }
+);
+
+router.get('/postDetail/:postId',
+    async function (ctx) {
+
+
+        let result = await PostController.getPostDetail(Number(ctx.params.postId))
+
+        ctx.body = result;
+
+    }
+)
+
+router.post('/getPostList',
+    koaBody(),
+    async function (ctx) {
+
+
+        let result = await PostController.getPostList(ctx.request.body.order);
+
+        //console.log(ctx.request.body)
+
+        ctx.body = result;
+
+    }
 )
 
 router.post('/getPhotosOfTheme',
@@ -182,7 +208,11 @@ router.get('/',
 
 
 //设置非公共接口访问前需要验证
-router.use('/private',function(ctx, next) {
+router.use('/private',
+    // koaBody({
+    //     jsonLimit: 52 *1024 *1024,
+    // }),
+    function(ctx, next) {
     if (ctx.isAuthenticated()) {
         return next()
     } else {
@@ -206,6 +236,25 @@ router.post('/private/createAlbum',
         let result =  await AlbumController.createAlbum(ctx.request.body, ctx.state.user.id)
 
         console.log(result)
+
+        ctx.body = {
+            success: false,
+        };
+
+    }
+)
+
+router.post('/private/createPost',
+    koaBody({
+        jsonLimit: 52 *1024 *1024,
+    }),
+    async function (ctx){
+
+        console.log(ctx.request.body)
+
+        let result =  await PostController.createPost(ctx.request.body, ctx.state.user.id)
+
+
 
         ctx.body = {
             success: false,
