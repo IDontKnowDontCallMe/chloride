@@ -19,6 +19,22 @@ db.sequelize.sync({force: false}).then(function() {
 
 const app = new Koa();
 
+//允许跨域
+app.use(cors({
+    origin: function(ctx) {
+        // if (ctx.url === '/test') {
+        //     return false;
+        // }
+        //console.log(ctx.url)
+        return 'http://localhost:8080';
+    },
+    exposeHeaders: ['WWW-Authenticate', 'Server-Authorization'],
+    maxAge: 5,
+    credentials: true,
+    allowMethods: ['GET', 'POST', 'DELETE'],
+    allowHeaders: ['Content-Type', 'Authorization', 'Accept', 'Cache-Control', 'X-Requested-With'],
+}))
+
 //静态资源映射(先这样应付着吧)
 let imagesPath = path.resolve(__dirname, '../statics');
 app.use(serve(imagesPath));
@@ -55,21 +71,7 @@ app.use(session(sessionConfig, app));
 
 // app.use(bodyParser(bodyParserConfig));
 
-//允许跨域
-app.use(cors({
-    origin: function(ctx) {
-        // if (ctx.url === '/test') {
-        //     return false;
-        // }
-        //console.log(ctx.url)
-        return 'http://localhost:8080';
-    },
-    exposeHeaders: ['WWW-Authenticate', 'Server-Authorization'],
-    maxAge: 5,
-    credentials: true,
-    allowMethods: ['GET', 'POST', 'DELETE'],
-    allowHeaders: ['Content-Type', 'Authorization', 'Accept', 'Cache-Control', 'X-Requested-With'],
-}))
+
 
 // authentication,加载passport设置
 require('./auth')

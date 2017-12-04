@@ -10,6 +10,6 @@ module.exports = {
     thumbnailPath: 'http://localhost:3000/images/thumbnail',
     originImgDir: path.resolve(__dirname, '../../statics/images/origin'),
     thumbnailDir: path.resolve(__dirname, '../../statics/images/thumbnail'),
-
+    videolDir: path.resolve(__dirname, '../../statics/videos'),
 
 }

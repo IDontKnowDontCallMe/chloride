@@ -5,6 +5,7 @@ const UserController = require('./controller/UserController');
 const PhotoController = require('./controller/PhotoController');
 const AlbumController = require('./controller/AlbumController');
 const PostController = require('./controller/PostController');
+const VideoController = require('./controller/VideoController');
 const AvatarDir = require('./util/StaticPath').avatarDir;
 
 const koaBody   = require('koa-body');
@@ -134,7 +135,39 @@ router.post('/uploadTempFile',
     }
 );
 
+router.post('/uploadTempVideo',
+    koaBody(bodyParserConfig),
+    async function (ctx) {
+
+        let param = {
+            qquuid: ctx.request.body.fields.qquuid,
+            tempFilePath: ctx.request.body.files.qqfile.path
+        }
+
+        let result = await VideoController.uploadTempVideo(param);
+
+
+        ctx.body = result;
+
+    }
+);
+
 router.delete('/deleteTempFile/:qquuid',
+    async function (ctx) {
+
+        ctx.status = 200;
+        ctx.body = {
+            success: true,
+            qquuid: ctx.params.qquuid,
+        };
+
+        console.log('delete')
+        console.log(ctx.params.qquuid)
+
+    }
+);
+
+router.delete('/deleteTempVideo/:qquuid',
     async function (ctx) {
 
         ctx.status = 200;
@@ -236,6 +269,32 @@ router.post('/private/createAlbum',
         let result =  await AlbumController.createAlbum(ctx.request.body, ctx.state.user.id)
 
         console.log(result)
+
+        ctx.body = {
+            success: false,
+        };
+
+    }
+)
+
+router.post('/private/createVideo',
+    koaBody(),
+    async function (ctx){
+
+        // const param = {
+        //     head : this.state.head,
+        //     description: this.state.description,
+        //     theme: this.state.theme,
+        //
+        //     tags: this.state.tags,
+        //     imageFiles: this.uploadedImage,
+        // }
+
+
+
+        let result =  await VideoController.createVideo(ctx.request.body, ctx.state.user.id)
+
+        console.log(ctx.request.body)
 
         ctx.body = {
             success: false,
