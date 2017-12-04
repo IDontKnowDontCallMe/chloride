@@ -70,7 +70,14 @@ async function getAlbumDitali(albumId, userId){
 
 }
 
-async function addAlbumComment(album) {
+async function addAlbumComment(param) {
+
+    let result = await AlbumService.addComment(param);
+
+    return {
+        success: true,
+        commentList: result,
+    }
 
 }
 
@@ -78,5 +85,6 @@ async function addAlbumComment(album) {
 module.exports = {
     createAlbum,
     getAlbumListOfTheme,
-    getAlbumDitali
+    getAlbumDitali,
+    addAlbumComment
 }

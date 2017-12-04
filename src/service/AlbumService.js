@@ -1,8 +1,10 @@
 const AlbumModel = require('../model').Album;
 const TagModel = require('../model').Tag;
+const AlbumComment = require('../model').AlbumComment;
 const PhotoModel = require('../model').Photo;
 const UserModel = require('../model').User;
 const originPath = require('../util/StaticPath').originPath;
+const avatarDir = require('../util/StaticPath').avatarDir;
 
 
 let recentCreatedAlbums = [];
@@ -125,7 +127,7 @@ async function getAlbumDetail(albumId, requestUserId){
         hasStaredIt = starUser.length===0? false: true;
     }
 
-
+    let commentList = await __getAlbumComments(albumId);
 
     return {
         albumId: album.id,
@@ -139,7 +141,7 @@ async function getAlbumDetail(albumId, requestUserId){
         hasStaredIt: hasStaredIt,
 
         photoList: photoList,
-        commentList: [],
+        commentList: commentList,
     }
 
 }
@@ -157,11 +159,46 @@ async function getAlbumListOfTheme(theme){
 
 }
 
+async function addComment({userId, albumId, content}) {
+
+    await AlbumComment.create({
+        content: content,
+        albumId: albumId,
+        authorId: userId,
+    });
+
+    return await __getAlbumComments(albumId);
+
+}
+
+async function __getAlbumComments(albumId) {
+
+    let comments = await AlbumComment.findAll({where: {albumId: albumId}, order:[['createdAt', 'ASC']]});
+    let result = [];
+
+    for(comment of comments){
+
+        let author = await comment.getAuthor()
+
+        result.push({
+            authorId: author.id,
+            authorName: author.username,
+            authorAvatar: avatarDir + author.avatar,
+            createdAt : comment.createdAt,
+            content: comment.content,
+        })
+    }
+
+    return result;
+
+}
+
 
 module.exports = {
 
     addAlbum,
     getAlbumDetail,
-    getAlbumListOfTheme
+    getAlbumListOfTheme,
+    addComment
 
 }

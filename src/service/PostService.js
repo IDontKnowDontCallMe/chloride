@@ -1,6 +1,7 @@
 const PostModel = require('../model').Post;
 const PostCommentModel = require('../model').PostComment;
 const UserModel = require('../model').User;
+const avatarDir = require('../util/StaticPath').avatarDir;
 
 
 
@@ -83,7 +84,7 @@ async function getPostDetail(postId) {
         return null;
     }
 
-    let author = await UserModel.findById(post.authorId);
+    let [author, postCommentList] = await Promise.all([UserModel.findById(post.authorId), __getPostComments(postId)]);
 
     return {
         postId: post.id,
@@ -94,14 +95,52 @@ async function getPostDetail(postId) {
         createdAt: post.createdAt,
         updatedAt: post.updatedAt,
 
-        postCommentList: [],
+        postCommentList: postCommentList,
     }
+
+}
+
+
+async function addComment({userId, toId, postId, content}) {
+
+    await PostCommentModel.create({
+        content: content,
+        postId: postId,
+        authorId: userId,
+        to: toId,
+    });
+
+    return await __getPostComments(postId);
+
+}
+
+async function __getPostComments(postId) {
+
+    let comments = await PostCommentModel.findAll({where: {postId: postId}, order:[['createdAt', 'ASC']]});
+    let result = [];
+
+    for(comment of comments){
+
+        let author = await comment.getAuthor()
+
+        result.push({
+            authorId: author.id,
+            authorName: author.username,
+            authorAvatar: avatarDir + author.avatar,
+            createdAt : comment.createdAt,
+            content: comment.content,
+            toId: comment.to,
+        })
+    }
+
+    return result;
 
 }
 
 module.exports = {
     createPost,
     getPostDetail,
-    getPostList
+    getPostList,
+    addComment
 
 }

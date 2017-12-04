@@ -7,7 +7,7 @@ module.exports = function(sequelize, DataTypes) {
             primaryKey: true,
             autoIncrement: true,
         },
-        conntent: {
+        content: {
             type: DataTypes.TEXT,
             allowNull: false,
             defaultValue: '无'

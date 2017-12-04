@@ -244,6 +244,33 @@ router.post('/private/createAlbum',
     }
 )
 
+
+router.post('/private/addAlbumComment',
+    koaBody({
+        jsonLimit: 5 *1024 *1024,
+    }),
+    async function (ctx){
+
+        let result =  await AlbumController.addAlbumComment(ctx.request.body);
+
+        ctx.body = result;
+
+    }
+)
+
+router.post('/private/addPostComment',
+    koaBody({
+        jsonLimit: 5 *1024 *1024,
+    }),
+    async function (ctx){
+
+        let result =  await PostController.addPostComment(ctx.request.body);
+
+        ctx.body = result;
+
+    }
+)
+
 router.post('/private/createPost',
     koaBody({
         jsonLimit: 52 *1024 *1024,

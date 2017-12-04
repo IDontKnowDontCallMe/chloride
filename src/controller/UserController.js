@@ -1,4 +1,5 @@
 const UserServicce = require('../service/UserService');
+const NotificationService = require('../service/NotificationService');
 const AvatarDir = require('../util/StaticPath').avatarDir;
 const thumbnailPath = require('../util/StaticPath').thumbnailPath;
 
@@ -138,8 +139,11 @@ async function getPeopleInfo(userId) {
     let followersList = [];
     let followingsList = [];
 
-    let followers = await UserServicce.getFollowersOf(userId);
-    let followings = await UserServicce.getFollowingsOf(userId);
+    let [followers, followings, notifications] = await Promise.all([
+        UserServicce.getFollowersOf(userId),
+        UserServicce.getFollowingsOf(userId),
+        NotificationService.getNotificationOf(userId)
+    ])
 
     for(follower of followers){
 
@@ -164,7 +168,7 @@ async function getPeopleInfo(userId) {
     return {
         success: true,
 
-        notificationList: [],
+        notificationList: notifications,
         followersList: followersList,
         followingsList: followingsList,
     }

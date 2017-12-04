@@ -41,10 +41,22 @@ async function getPostList(order){
 
 }
 
+async function addPostComment(param){
+
+    let postCommentList = await PostService.addComment(param);
+
+    return {
+        success: true,
+        postCommentList: postCommentList,
+    }
+
+}
+
 
 
 module.exports = {
     createPost,
     getPostDetail,
-    getPostList
+    getPostList,
+    addPostComment
 }
