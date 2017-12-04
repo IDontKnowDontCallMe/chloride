@@ -194,11 +194,53 @@ async function __getAlbumComments(albumId) {
 }
 
 
+async function addAlbumStar({userId, albumId}){
+    let album = await AlbumModel.findById(albumId);
+
+    let users = await album.getStarUsers({where:{id: userId}})
+    //the user didn't star this album
+    if(users.length === 0){
+
+        let user = await UserModel.findById(userId);
+
+        await Promise.all([album.addStarUsers(user) , album.increment('star', {by:1})]);
+
+        return true;
+    }
+    else {
+        return false;
+    }
+
+}
+
+async function cancelAlbumStar({userId, albumId}){
+
+    let album = await AlbumModel.findById(albumId);
+
+    let users = await album.getStarUsers({where:{id: userId}})
+    //the user did stared this album
+    if(users.length !== 0){
+
+        let user = await UserModel.findById(userId);
+
+        await Promise.all([album.removeStarUsers(user), album.decrement('star', {by:1})]);
+
+        return true;
+    }
+    else {
+        return false;
+    }
+
+}
+
+
 module.exports = {
 
     addAlbum,
     getAlbumDetail,
     getAlbumListOfTheme,
-    addComment
+    addComment,
+    cancelAlbumStar,
+    addAlbumStar
 
 }

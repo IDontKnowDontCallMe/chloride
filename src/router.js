@@ -244,6 +244,30 @@ router.post('/private/createAlbum',
     }
 )
 
+router.post('/private/addAlbumStar',
+    koaBody(),
+    async function (ctx){
+
+    console.log(ctx.request.body)
+
+        let result =  await AlbumController.addAlbumStar(ctx.request.body);
+
+        ctx.body = result;
+
+    }
+)
+
+router.post('/private/cancelAlbumStar',
+    koaBody(),
+    async function (ctx){
+
+        let result =  await AlbumController.cancelAlbumStar(ctx.request.body);
+
+        ctx.body = result;
+
+    }
+)
+
 
 router.post('/private/addAlbumComment',
     koaBody({

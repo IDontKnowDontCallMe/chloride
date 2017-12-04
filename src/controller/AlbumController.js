@@ -81,10 +81,30 @@ async function addAlbumComment(param) {
 
 }
 
+async function addAlbumStar(param) {
+
+    let result = await AlbumService.addAlbumStar(param);
+
+    return {
+        success: result,
+    }
+}
+
+async function cancelAlbumStar(param) {
+
+    let result = await AlbumService.cancelAlbumStar(param)
+
+    return {
+        success: result,
+    }
+}
+
 
 module.exports = {
     createAlbum,
     getAlbumListOfTheme,
     getAlbumDitali,
-    addAlbumComment
+    addAlbumComment,
+    addAlbumStar,
+    cancelAlbumStar
 }
