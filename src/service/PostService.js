@@ -3,7 +3,47 @@ const PostCommentModel = require('../model').PostComment;
 const UserModel = require('../model').User;
 const avatarDir = require('../util/StaticPath').avatarDir;
 
+let hotPosts = [];
+const MAX_HOT_POST_NUM = 5;
+async function __initPostService() {
 
+    let postList = await PostModel.findAll({
+        include: [{
+            model: PostCommentModel,
+            as: 'comments',
+        }],
+        order: [['createdAt', 'DESC']]})
+
+    postList.sort(function (a, b) {
+        return b.comments.length - a.comments.length;
+    });
+
+    for(let post of postList){
+
+        if(hotPosts.length < MAX_HOT_POST_NUM){
+            hotPosts.push({
+                url: '',
+                postId: post.id,
+                postName: post.title,
+                createdAt: post.createdAt,
+                updatedAt: post.updatedAt,
+                answerNum: post.comments.length,
+            })
+        }
+        else {
+            break;
+        }
+    }
+
+    // console.log('hot posts')
+    // console.log(hotPosts);
+
+}
+__initPostService();
+
+async function getHotPosts() {
+    return hotPosts;
+}
 
 async function getPostList( order) {
 
@@ -110,6 +150,12 @@ async function addComment({userId, toId, postId, content}) {
         to: toId,
     });
 
+    await PostModel.findById(postId).then((post)=>{
+        post.update({
+            updatedAt: Date.now(),
+        })
+    })
+
     return await __getPostComments(postId);
 
 }
@@ -141,6 +187,7 @@ module.exports = {
     createPost,
     getPostDetail,
     getPostList,
-    addComment
+    addComment,
+    getHotPosts
 
 }

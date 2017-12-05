@@ -5,6 +5,7 @@ const bluePromise = require('bluebird')
 bluePromise.promisifyAll(fs);
 const VideoModel = require('../model').Video;
 const videoDir = require('../util/StaticPath').videolDir;
+const videoPath = require('../util/StaticPath').videolPath;
 
 
 async function transformVideo(tempFilePath, newFileName, videoId){
@@ -55,10 +56,29 @@ async function createVideo({name, authorId }){
 
 }
 
+async function getAllVideos() {
+
+    let videos = await VideoModel.findAll();
+    let result = [];
+
+    for(let video of videos){
+
+        result.push({
+            id: video.id,
+            name: video.name,
+            origin: videoPath+video.origin,
+        })
+
+    }
+
+    return result;
+}
+
 
 module.exports = {
 
     transformVideo,
     createVideo,
+    getAllVideos
 
 }

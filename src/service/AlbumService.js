@@ -7,67 +7,84 @@ const originPath = require('../util/StaticPath').originPath;
 const avatarDir = require('../util/StaticPath').avatarDir;
 
 
-let recentCreatedAlbums = [];
 let hotAlbums = [];
-let allAlbums = [];
-/*
-* key: theme:string;  object: array:idPriority
-*
-* idPriority{
-*   id: albumId, int
-*   name
-*   priority: int
-* }
-*
-* */
-let themeClassifyMap = new Map();
-let tagClassifyMap = new Map();
+let allAlbums = new Map();
 
 
 
-function calculatePriority(album) {
+
+function __calculatePriority(album) {
 
     return album.star;
 }
 
+function __hotAlbumsContains( id) {
+
+    for(let album of hotAlbums){
+        if(id === album.id){
+            return true;
+        }
+    }
+
+    return false;
+
+}
+
 async function initAlbumService() {
 
-    let albumList = AlbumModel.findAll({raw: true, include:[{ model: TagModel, as: 'albumTags' }], order:[['createdAt', 'DESC']]});
+    let albumList = await AlbumModel.findAll({ include:[{ model: TagModel, as: 'albumTags' }], order:[['createdAt', 'DESC']]});
 
-    albumList.forEach(function (album) {
+    for(let album of albumList){
+        let priority = __calculatePriority(album);
 
-        let priority = calculatePriority(album);
-
+        let tags = [];
+        //console.log(album.getAlbumTags())
+        let tagLsit = await album.getAlbumTags();
+        for(let tag of tagLsit){
+            tags.push(tag.title);
+        }
         let simpleInfo = {
             id: album.id,
             name: album.name,
+            tags: tags,
+            coverImg: album.coverImg,
+            star: album.star,
             priority: priority,
         }
 
-        allAlbums.push(simpleInfo);
+        allAlbums.set(album.id, simpleInfo);
 
-        if(recentCreatedAlbums.length < 10){
-            recentCreatedAlbums.push(simpleInfo);
+        if(hotAlbums.length < 10){
+            hotAlbums.push(album);
         }
+    }
 
-        if(themeClassifyMap.get(album.theme) === undefined){
-            themeClassifyMap.set(album.theme, []);
-        }
-
-        themeClassifyMap.get(album.theme).push(simpleInfo);
-
-        album.albumTags.forEach(function (tag) {
-            if(tagClassifyMap.get(tag.name)===undefined){
-                tagClassifyMap.set(tag.name, []);
-            }
-            tagClassifyMap.get(tag.name).push(simpleInfo);
-        })
-
-
-    })
+    // for(let value of allAlbums.values()){
+    //     console.log('allAlbums')
+    //     console.log(value);
+    // }
 
 }
 initAlbumService();
+
+
+async function getHomePageAlbums() {
+
+    let result = [];
+
+    for(let album of hotAlbums){
+        result.push({
+            url: '',
+            coverUrl: originPath+album.coverImg,
+            name: album.name,
+            starNum: album.star,
+            albumId: album.id,
+        })
+    }
+
+    return result;
+
+}
 
 /*
 *
@@ -92,6 +109,23 @@ async function addAlbum(album){
                             authorId: album.authorId,
                             coverImg: ''
                         });
+
+    if(!__hotAlbumsContains(result.id)){
+        hotAlbums.unshift(result);
+        if(hotAlbums.length > 10){
+            hotAlbums.pop();
+        }
+    }
+
+    let simpleInfo = {
+        id: result.id,
+        name: result.name,
+        tags: [],
+        coverImg: result.coverImg,
+        star: result.star,
+        priority: 0,
+    }
+    allAlbums.set(result.id, simpleInfo);
 
     return result;
 
@@ -203,6 +237,13 @@ async function addAlbumStar({userId, albumId}){
 
         let user = await UserModel.findById(userId);
 
+        if(!__hotAlbumsContains(albumId)){
+            hotAlbums.unshift(album);
+            if(hotAlbums.length > 10){
+                hotAlbums.pop();
+            }
+        }
+
         await Promise.all([album.addStarUsers(user) , album.increment('star', {by:1})]);
 
         return true;
@@ -241,6 +282,7 @@ module.exports = {
     getAlbumListOfTheme,
     addComment,
     cancelAlbumStar,
-    addAlbumStar
+    addAlbumStar,
+    getHomePageAlbums
 
 }

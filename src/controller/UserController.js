@@ -1,5 +1,8 @@
 const UserServicce = require('../service/UserService');
 const NotificationService = require('../service/NotificationService');
+const AlbumService = require('../service/AlbumService');
+const PostService = require('../service/PostService');
+const VideoService = require('../service/VideoService');
 const AvatarDir = require('../util/StaticPath').avatarDir;
 const thumbnailPath = require('../util/StaticPath').thumbnailPath;
 
@@ -175,6 +178,19 @@ async function getPeopleInfo(userId) {
 
 }
 
+async function getHomePageContent(){
+
+    let [hotAlbums, hotPosts, hotVideos] = await Promise.all([AlbumService.getHomePageAlbums(), PostService.getHotPosts(), VideoService.getAllVideos()])
+
+    return {
+        success: true,
+        hotAlbums: hotAlbums,
+        hotPosts: hotPosts,
+        hotVideos: hotVideos,
+    }
+
+}
+
 
 module.exports = {
 
@@ -183,6 +199,7 @@ module.exports = {
     getUserInfo,
     addFollowing,
     cancelFollowing,
-    getPeopleInfo
+    getPeopleInfo,
+    getHomePageContent
 
 };

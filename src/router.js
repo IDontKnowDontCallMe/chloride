@@ -100,6 +100,14 @@ router.post('/logout',
     }
 )
 
+router.get('/getHomePage',
+    async function (ctx) {
+
+        ctx.body = await UserController.getHomePageContent();
+
+    }
+)
+
 router.get('/userInfo/:userId',
     async function (ctx){
 
